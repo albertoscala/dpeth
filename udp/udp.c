@@ -55,6 +55,7 @@ udp_err_t udp_create_client(const char* addr, int port, udp_t* client)
     return UDP_OK;
 }
 
+//TODO: Implement fragmentetion
 udp_err_t udp_send(const void* buf, size_t n, udp_t* session)
 {
     if (sendto(session->fd, buf, n, MSG_CONFIRM, (const struct sockaddr *)&session->servaddr, sizeof(session->servaddr)) < 0)
@@ -63,6 +64,7 @@ udp_err_t udp_send(const void* buf, size_t n, udp_t* session)
     return UDP_OK;
 }
 
+//TODO: Ressemble fragments
 udp_err_t udp_recv(void* buf, size_t n, udp_t* session)
 {
     if (recvfrom(session->fd, buf, n, MSG_WAITALL, NULL, NULL) < 0)
