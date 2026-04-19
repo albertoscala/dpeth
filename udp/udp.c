@@ -2,6 +2,14 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#ifdef __APPLE__
+#include <unistd.h>
+#endif
+
+// MACOS compatibility
+#ifdef __APPLE__
+#define MSG_CONFIRM 0
+#endif
 
 udp_err_t udp_create_server(const char* addr, int port, udp_t* server)
 {
@@ -51,12 +59,16 @@ udp_err_t udp_send(const void* buf, size_t n, udp_t* session)
 {
     if (sendto(session->fd, buf, n, MSG_CONFIRM, (const struct sockaddr *)&session->servaddr, sizeof(session->servaddr)) < 0)
         return UDP_SEND_FAIL;
+
+    return UDP_OK;
 }
 
 udp_err_t udp_recv(void* buf, size_t n, udp_t* session)
 {
-    if (recvfrom(session->fd, buf, n, MSG_WAITALL, (struct sockaddr *)&session->servaddr, sizeof(session->servaddr)) < 0)
+    if (recvfrom(session->fd, buf, n, MSG_WAITALL, NULL, NULL) < 0)
         return UDP_RECV_FAIL;
+
+    return UDP_OK;
 }
 
 udp_err_t udp_destroy(udp_t* session)

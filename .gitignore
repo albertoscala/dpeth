@@ -1,1 +1,12 @@
+# ROOT IGNORE
+
 .vscode
+
+# UDP IGNORE
+
+udp/client.dSYM
+udp/server.dSYM
+udp/client
+udp/server
+
+# DPETH IGNORE
