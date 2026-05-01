@@ -1,14 +1,35 @@
 #ifndef DPETH_H
 #define DPETH_H
 
+#include "../udp/udp.h"
+
 #include <stdint.h>
+#include <stdio.h>
 
 #define listen dpeth_recv_loop
 #define feed dpeth_send_loop
 
+#define ADDR "127.0.0.1"
+#define PORT_SINK 6767
+#define PORT_SOURCE 6768
+
+#define N_ATTEMPS 15
+
+#define WIDTH 1920
+#define HEIGHT 1080
+#define FPS 60
+
+#define CONN_ACK 0xFF
+
 typedef enum
 {
     DPETH_OK = 0,
+    DPETH_UDP_SERVER_FAIL,
+    DPETH_UDP_CLIENT_FAIL,
+    DPETH_UDP_HANDSHAKE_FAIL,
+    DPETH_ACK_SEND_FAIL,
+    DPETH_UDP_RECV_FAIL,
+    DPETH_ACK_FAIL,
 } dpeth_err_t;
 
 typedef enum
@@ -35,8 +56,8 @@ typedef struct {
     dpeth_depth_t color_depth;   // bits per channel
 } __attribute__((packed)) dp_connect_t;
 
-dpeth_err_t dpeth_create_sink();
-dpeth_err_t dpeth_create_source();
+dpeth_err_t dpeth_create_sink(dp_connect_t* connect);
+dpeth_err_t dpeth_create_source(dp_connect_t* connect);
 
 dpeth_err_t dpeth_recv_frame();
 dpeth_err_t dpeth_send_frame();

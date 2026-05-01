@@ -1,12 +1,82 @@
 #include "dpeth.h"
 
-dpeth_err_t dpeth_create_sink()
+udp_session_t server, client;
+
+udp_config_t config = {
+    .addr = ADDR,
+    .sink_port = PORT_SINK,
+    .source_port = PORT_SOURCE,
+};
+
+dpeth_err_t dpeth_create_sink(dp_connect_t* connect)
 {
-    return DPETH_OK;
+    if (udp_create_client(&config, &client) != UDP_OK)
+    {
+        printf("Couldn't create the udp server...\n");
+        return DPETH_UDP_SERVER_FAIL;
+    }
+
+    //FIXME: Debug
+    printf("Sink sending to port %d, listening on port %d\n", PORT_SOURCE, PORT_SINK);
+
+    int attempts = N_ATTEMPS;
+    while (attempts--)
+    {
+        if (udp_send(connect, sizeof(dp_connect_t), &client) != UDP_OK)
+            continue;
+
+        // RECV CONNECT_ACK
+        uint8_t ack = 0x0;
+        udp_err_t err = udp_recv(&ack, sizeof(uint8_t), &client);
+        if (err != UDP_OK || ack != CONN_ACK)
+        {
+            if (err != UDP_OK) 
+            { 
+                printf("Retrying connection (%d attempts left)...\n", attempts);
+                continue;
+            }
+            else 
+            { 
+                printf("Ack returned bad...\n"); 
+                return DPETH_ACK_FAIL; 
+            }
+        }
+        else 
+        {
+            return DPETH_OK;
+        }
+    }
+
+    printf("Couldn't perform the handshake...\n");
+    return DPETH_UDP_HANDSHAKE_FAIL;
 }
 
-dpeth_err_t dpeth_create_source()
+dpeth_err_t dpeth_create_source(dp_connect_t* connect)
 {
+    if (udp_create_server(&config, &server) != UDP_OK)
+    {
+        printf("Couldn't create the udp client...\n");
+        return DPETH_UDP_CLIENT_FAIL;
+    }
+
+    //FIXME: Debug
+    printf("Source listening on port %d\n", PORT_SOURCE);
+
+    // RECV CONNECT
+    if (udp_recv(connect, sizeof(dp_connect_t), &server) != UDP_OK)
+    {
+        printf("Couldn't receive the requirements...\n");
+        return DPETH_UDP_RECV_FAIL;
+    }
+
+    // SEND CONNECT_ACK
+    uint8_t ack = CONN_ACK;
+    if (udp_send(&ack, sizeof(uint8_t), &server) != UDP_OK)
+    {
+        printf("Couldn't send the ack...\n");
+        return DPETH_ACK_SEND_FAIL;
+    }
+
     return DPETH_OK;
 }
 

@@ -7,7 +7,7 @@
 
 int main()
 {
-    udp_t client;
+    udp_session_t client;
     memset(&client, 0, sizeof(client));
 
     (void)udp_create_client("127.0.0.1", 6767, &client);
