@@ -80,13 +80,51 @@ dpeth_err_t dpeth_create_source(dp_connect_t* connect)
     return DPETH_OK;
 }
 
-dpeth_err_t dpeth_recv_frame()
+dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, const uint8_t* fb)
 {
+    size_t fb_size = connect->width * connect->height * connect->pixel_format;
+    size_t bytes_send = 0;
+    while (fb_size >= PACK_SIZE)
+    {
+        if (udp_recv(fb + bytes_send, PACK_SIZE, &client) != UDP_OK)
+        {
+            //TODO: Handle
+        }
+        bytes_send += PACK_SIZE;
+        fb_size -= PACK_SIZE;
+    }
+    if (fb_size > 0)
+    {
+        if (udp_recv(fb + bytes_send, fb_size, &client) != UDP_OK)
+        {
+            //TODO: Handle
+        }
+    }
+
     return DPETH_OK;
 }
 
-dpeth_err_t dpeth_send_frame()
+dpeth_err_t dpeth_send_frame(dp_connect_t* connect, uint8_t* fb)
 {
+    size_t fb_size = connect->width * connect->height * connect->pixel_format;
+    size_t bytes_recv = 0;
+    while (fb_size >= PACK_SIZE)
+    {
+        if (udp_send(fb + bytes_recv, PACK_SIZE, &server) != UDP_OK)
+        {
+            //TODO: Handle
+        }
+        bytes_recv += PACK_SIZE;
+        fb_size -= PACK_SIZE;
+    }
+    if (fb_size > 0)
+    {
+        if (udp_send(fb + bytes_recv, fb_size, &server) != UDP_OK)
+        {
+            //TODO: Handle
+        }
+    }
+
     return DPETH_OK;
 }
 

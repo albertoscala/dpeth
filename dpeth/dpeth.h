@@ -9,15 +9,17 @@
 #define listen dpeth_recv_loop
 #define feed dpeth_send_loop
 
-#define ADDR "127.0.0.1"
+#define ADDR "192.168.1.3"
 #define PORT_SINK 6767
 #define PORT_SOURCE 6768
+
+#define PACK_SIZE 512
 
 #define N_ATTEMPS 15
 
 #define WIDTH 1920
 #define HEIGHT 1080
-#define FPS 60
+#define FPS 20
 
 #define CONN_ACK 0xFF
 
@@ -34,17 +36,17 @@ typedef enum
 
 typedef enum
 {
-    RGB888 = 0,
-    YUV444,
-    YUV422,
+    RGB888 = 3,
+    YUV444 = 6,
+    YUV422 = 3,
 } dpeth_format_t;
 
 typedef enum
 {
-    SDR = 0,    // 8bit color depth
-    HDR,        // 10bit color depth 
-    HDRP,       // 12bit color depth
-    HBD         // 16bit color depth (medical/scientific image)
+    SDR = 8,    // 8bit color depth
+    HDR = 10,   // 10bit color depth 
+    HDRP = 12,  // 12bit color depth
+    HBD = 16    // 16bit color depth (medical/scientific image)
 } dpeth_depth_t;
 
 // CONNECT payload — the only "negotiation" you need
@@ -59,8 +61,8 @@ typedef struct {
 dpeth_err_t dpeth_create_sink(dp_connect_t* connect);
 dpeth_err_t dpeth_create_source(dp_connect_t* connect);
 
-dpeth_err_t dpeth_recv_frame();
-dpeth_err_t dpeth_send_frame();
+dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, const uint8_t* fb);
+dpeth_err_t dpeth_send_frame(dp_connect_t* connect, uint8_t* fb);
 
 dpeth_err_t dpeth_recv_loop();
 dpeth_err_t dpeth_send_loop();

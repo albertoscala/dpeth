@@ -5,12 +5,6 @@
 #include <sys/time.h>
 #include <string.h>
 
-// MACOS compatibility
-#ifdef __APPLE__
-#include <unistd.h>
-#define MSG_CONFIRM 0
-#endif
-
 udp_err_t udp_create_server(const udp_config_t* config, udp_session_t* session)
 {
     // Creating socket file descriptor 
@@ -20,13 +14,11 @@ udp_err_t udp_create_server(const udp_config_t* config, udp_session_t* session)
     // Filling server information 
     session->addr.sin_family = AF_INET; // IPv4
 
-    // int err = inet_pton(AF_INET, config->addr, &session->addr.sin_addr); 
-    // if (err == 0)
-    //     return UDP_ADDR_INVALID;
-    // else if (err < 0)
-    //     return UDP_ADDR_FAMILY_INVALID;
+    int err = inet_pton(AF_INET, config->addr, &session->addr.sin_addr); 
+    if (err == 0) return UDP_ADDR_INVALID;
+    else if (err < 0) return UDP_ADDR_FAMILY_INVALID;
 
-    session->addr.sin_addr.s_addr = INADDR_ANY;
+    // session->addr.sin_addr.s_addr = INADDR_ANY;
     
     session->addr.sin_port = htons(config->source_port);
       
@@ -47,10 +39,8 @@ udp_err_t udp_create_client(const udp_config_t* config, udp_session_t* session)
     session->peeraddr.sin_family = AF_INET; // IPv4 
     
     int err = inet_pton(AF_INET, config->addr, &session->peeraddr.sin_addr);
-        if (err == 0)
-        return UDP_ADDR_INVALID;
-    else if (err < 0)
-        return UDP_ADDR_FAMILY_INVALID;
+    if (err == 0) return UDP_ADDR_INVALID;
+    else if (err < 0) return UDP_ADDR_FAMILY_INVALID;
     
     session->peeraddr.sin_port = htons(config->source_port);
 
