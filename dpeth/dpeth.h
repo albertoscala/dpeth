@@ -11,17 +11,18 @@
 
 #define ADDR "192.168.1.3"
 #define PORT_SINK 6767
-#define PORT_SOURCE 6768
+#define PORT_SOURCE 6767
 
-#define PACK_SIZE 512
+#define PACK_SIZE 65507
 
 #define N_ATTEMPS 15
 
-#define WIDTH 1920
-#define HEIGHT 1080
-#define FPS 20
+#define WIDTH 800
+#define HEIGHT 600
+#define FPS 5
 
 #define CONN_ACK 0xFF
+#define FRAME_ACK 0xAA
 
 typedef enum
 {
@@ -30,13 +31,16 @@ typedef enum
     DPETH_UDP_CLIENT_FAIL,
     DPETH_UDP_HANDSHAKE_FAIL,
     DPETH_ACK_SEND_FAIL,
+    DPETH_ACK_FRAME_FAIL,
     DPETH_UDP_RECV_FAIL,
+    DPETH_UDP_SEND_FAIL,
     DPETH_ACK_FAIL,
 } dpeth_err_t;
 
 typedef enum
 {
     RGB888 = 3,
+    ARGB8888 = 4,
     YUV444 = 6,
     YUV422 = 3,
 } dpeth_format_t;
@@ -61,8 +65,8 @@ typedef struct {
 dpeth_err_t dpeth_create_sink(dp_connect_t* connect);
 dpeth_err_t dpeth_create_source(dp_connect_t* connect);
 
-dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, const uint8_t* fb);
-dpeth_err_t dpeth_send_frame(dp_connect_t* connect, uint8_t* fb);
+dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, uint8_t* fb);
+dpeth_err_t dpeth_send_frame(dp_connect_t* connect, const uint8_t* fb);
 
 dpeth_err_t dpeth_recv_loop();
 dpeth_err_t dpeth_send_loop();

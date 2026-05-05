@@ -1,5 +1,7 @@
 #include "dpeth.h"
 
+#include <stdbool.h>
+
 udp_session_t server, client;
 
 udp_config_t config = {
@@ -80,7 +82,7 @@ dpeth_err_t dpeth_create_source(dp_connect_t* connect)
     return DPETH_OK;
 }
 
-dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, const uint8_t* fb)
+dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, uint8_t* fb)
 {
     size_t fb_size = connect->width * connect->height * connect->pixel_format;
     size_t bytes_send = 0;
@@ -101,10 +103,18 @@ dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, const uint8_t* fb)
         }
     }
 
+    //TODO: Send the ACK (complete frame)
+    uint8_t ack = FRAME_ACK;
+    if (udp_send(&ack, sizeof(uint8_t), &client) != UDP_OK)
+    {
+        printf("Couldn't send the frame ack...\n");
+        return DPETH_ACK_FRAME_FAIL;
+    }
+
     return DPETH_OK;
 }
 
-dpeth_err_t dpeth_send_frame(dp_connect_t* connect, uint8_t* fb)
+dpeth_err_t dpeth_send_frame(dp_connect_t* connect, const uint8_t* fb)
 {
     size_t fb_size = connect->width * connect->height * connect->pixel_format;
     size_t bytes_recv = 0;
@@ -122,6 +132,23 @@ dpeth_err_t dpeth_send_frame(dp_connect_t* connect, uint8_t* fb)
         if (udp_send(fb + bytes_recv, fb_size, &server) != UDP_OK)
         {
             //TODO: Handle
+        }
+    }
+
+    // RECV CONNECT_ACK
+    uint8_t ack = 0x0;
+    udp_err_t err = udp_recv(&ack, sizeof(uint8_t), &server);
+    if (err != UDP_OK || ack != FRAME_ACK)
+    {
+        if (err != UDP_OK) 
+        { 
+            printf("Couldn't receive the ACK...");
+            return DPETH_UDP_RECV_FAIL;
+        }
+        else
+        { 
+            printf("Frame ACK returned bad...\n"); 
+            return DPETH_ACK_FRAME_FAIL; 
         }
     }
 

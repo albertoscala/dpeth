@@ -1,14 +1,15 @@
 CC = gcc
-CFLAGS = -Wall -g $(shell sdl2-config --cflags)
-LIBS_SDL = $(shell sdl2-config --libs)
+CFLAGS = -Wall -g
 UDP = ../udp/udp.c
+TCP = ../tcp/tcp.c
 
-sink:
-	$(CC) $(CFLAGS) -o display display.c dpeth.c $(UDP) $(LIBS_SDL)
+display:
+	$(CC) $(CFLAGS) -o display display.c dpeth.c $(UDP) $(TCP)
+
 source:
-	$(CC) $(CFLAGS) -o source source.c dpeth.c $(UDP)
-frame_test:
-	$(CC) $(CFLAGS) -o frame_test frame_test.c -lX11
-all: sink source
+	$(CC) $(CFLAGS) -o source source.c dpeth.c $(UDP) $(TCP) -lm
+
+all: display source
+
 clean:
-	rm -f sink source frame_test
+	rm -f display source frame_test
