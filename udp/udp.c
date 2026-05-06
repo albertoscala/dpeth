@@ -1,6 +1,9 @@
+#define _GNU_SOURCE
+
 #include "udp.h"
 
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <string.h>
@@ -92,6 +95,40 @@ udp_err_t udp_recv(void* buf, size_t n, udp_session_t* session)
     socklen_t len = sizeof(struct sockaddr_in);
     if (recvfrom(session->fd, buf, n, MSG_WAITALL, (struct sockaddr *)&session->peeraddr, &len) < 0)
         return UDP_RECV_FAIL;
+
+    return UDP_OK;
+}
+
+udp_err_t udp_recvmmsg(void* buf, size_t n, size_t pack_size, udp_session_t* session)
+{
+    int batch_size = n / pack_size;
+    size_t remainder = n % pack_size;
+
+    struct iovec iovecs[batch_size];
+    struct mmsghdr msgs[batch_size];
+    memset(msgs, 0, sizeof(msgs));
+    
+    for (int i = 0; i < batch_size; i++) 
+    {
+        iovecs[i].iov_base = (uint8_t*)buf + i * pack_size;
+        iovecs[i].iov_len = pack_size;
+        msgs[i].msg_hdr.msg_iov = &iovecs[i];
+        msgs[i].msg_hdr.msg_iovlen = 1;
+    }
+
+    int total_received = 0;
+    while (total_received < batch_size) 
+    {
+        int received = recvmmsg(session->fd, msgs + total_received,batch_size - total_received, MSG_WAITFORONE, NULL);
+        if (received < 0) return UDP_RECV_FAIL;
+        total_received += received;
+    }
+
+    if (remainder > 0)
+    {
+        if (udp_recv((uint8_t*)buf + batch_size * pack_size, remainder, session) != UDP_OK)
+            return UDP_RECV_FAIL;
+    }
 
     return UDP_OK;
 }

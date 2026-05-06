@@ -32,8 +32,9 @@ typedef enum
     DPETH_UDP_HANDSHAKE_FAIL,
     DPETH_ACK_SEND_FAIL,
     DPETH_ACK_FRAME_FAIL,
-    DPETH_UDP_RECV_FAIL,
     DPETH_UDP_SEND_FAIL,
+    DPETH_UDP_RECV_FAIL,
+    DPETH_UDP_RECVMMSG_FAIL,
     DPETH_ACK_FAIL,
 } dpeth_err_t;
 
@@ -62,16 +63,17 @@ typedef struct {
     dpeth_depth_t color_depth;   // bits per channel
 } __attribute__((packed)) dp_connect_t;
 
-dpeth_err_t dpeth_create_sink(dp_connect_t* connect);
 dpeth_err_t dpeth_create_source(dp_connect_t* connect);
+dpeth_err_t dpeth_create_sink(dp_connect_t* connect);
 
-dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, uint8_t* fb);
 dpeth_err_t dpeth_send_frame(dp_connect_t* connect, const uint8_t* fb);
+dpeth_err_t dpeth_recv_frame(dp_connect_t* connect, uint8_t* fb);
+dpeth_err_t dpeth_recvmmsg_frame(dp_connect_t* connect, uint8_t* fb);
 
-dpeth_err_t dpeth_recv_loop();
 dpeth_err_t dpeth_send_loop();
+dpeth_err_t dpeth_recv_loop();
 
-dpeth_err_t dpeth_close_sink();
 dpeth_err_t dpeth_close_source();
+dpeth_err_t dpeth_close_sink();
 
 #endif /* DPETH_H */
