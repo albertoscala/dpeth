@@ -17,9 +17,9 @@
 
 #define N_ATTEMPS 15
 
-#define WIDTH 800
-#define HEIGHT 600
-#define FPS 5
+#define WIDTH 1920
+#define HEIGHT 1080
+#define FPS 20
 
 #define CONN_ACK 0xFF
 #define FRAME_ACK 0xAA

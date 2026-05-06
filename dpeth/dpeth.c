@@ -138,6 +138,9 @@ dpeth_err_t dpeth_send_frame(dp_connect_t* connect, const uint8_t* fb)
     // RECV CONNECT_ACK
     uint8_t ack = 0x0;
     udp_err_t err = udp_recv(&ack, sizeof(uint8_t), &server);
+
+    printf("ACK ARRIVATO FORSE!!!\n");
+
     if (err != UDP_OK || ack != FRAME_ACK)
     {
         if (err != UDP_OK) 

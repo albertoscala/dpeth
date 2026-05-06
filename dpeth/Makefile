@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -O3
 UDP = ../udp/udp.c
 TCP = ../tcp/tcp.c
 

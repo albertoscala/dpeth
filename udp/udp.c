@@ -10,7 +10,12 @@ udp_err_t udp_create_server(const udp_config_t* config, udp_session_t* session)
     // Creating socket file descriptor 
     if ((session->fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 )
         return UDP_SOCK_FAIL; 
-      
+    
+    // bump socket buffers
+    int bufsize = 26214400; // 25MB
+    setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize));
+    setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize));
+
     // Filling server information 
     session->addr.sin_family = AF_INET; // IPv4
 
@@ -34,6 +39,11 @@ udp_err_t udp_create_client(const udp_config_t* config, udp_session_t* session)
     // Create UDP socket
     if ((session->fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
         return UDP_SOCK_FAIL;
+
+    // bump socket buffers
+    int bufsize = 26214400; // 25MB
+    setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize));
+    setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize));
 
     // Filling server information 
     session->peeraddr.sin_family = AF_INET; // IPv4 
