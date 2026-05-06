@@ -13,8 +13,10 @@ udp_err_t udp_create_server(const udp_config_t* config, udp_session_t* session)
     
     // bump socket buffers
     int bufsize = 26214400; // 25MB
-    setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize));
-    setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize));
+    if (setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize)) < 0)
+        return UDP_SEND_BUF_FAIL;       
+    if (setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize)) < 0)
+        return UDP_RECV_BUF_FAIL;       
 
     // Filling server information 
     session->addr.sin_family = AF_INET; // IPv4
@@ -42,8 +44,10 @@ udp_err_t udp_create_client(const udp_config_t* config, udp_session_t* session)
 
     // bump socket buffers
     int bufsize = 26214400; // 25MB
-    setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize));
-    setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize));
+    if (setsockopt(session->fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize)) < 0)
+        return UDP_SEND_BUF_FAIL;
+    if (setsockopt(session->fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize)) < 0)
+        return UDP_RECV_BUF_FAIL;
 
     // Filling server information 
     session->peeraddr.sin_family = AF_INET; // IPv4 
