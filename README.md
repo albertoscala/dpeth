@@ -70,8 +70,6 @@ Then start the **source** endpoint:
 sudo ./bin/source
 ```
 
-> Raw socket operations typically require root privileges (`sudo`).
-
 ## License
 
 [MIT](LICENSE)
