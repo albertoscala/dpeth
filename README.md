@@ -61,13 +61,13 @@ make clean
 Start the **display** endpoint first:
 
 ```bash
-sudo ./bin/display
+./bin/display
 ```
 
 Then start the **source** endpoint:
 
 ```bash
-sudo ./bin/source
+./bin/source
 ```
 
 ## License
