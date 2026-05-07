@@ -1,12 +1,5 @@
-# ROOT IGNORE
-
+# remove vscode config
 .vscode
 
-# UDP IGNORE
-
-udp/client.dSYM
-udp/server.dSYM
-udp/client
-udp/server
-
-# DPETH IGNORE
+# remove bin folder content
+bin/*
